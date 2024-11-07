@@ -8,10 +8,10 @@ export function Header() {
     return (
 
         <>
-            <div className="">
+            <div className="position-sticky top-0 z-2">
                 <header className="px-5 bg-light d-flex justify-content-between align-items-center" style={{height:"10vh"}}>
                     <div className="fs-4">Logo</div>
-                    <nav className="d-flex fs-5">
+                    <nav className="d-flex fs-6">
                         <span className="nav-items">home</span>
                         <span className="nav-items">showtimings</span>
                         <span className="nav-items">cinema</span>
@@ -27,7 +27,7 @@ export function Header() {
                         </span>
                     </nav>
                     <div>
-                        <button onClick={logoutclick} className="btn btn-danger">logout</button>
+                        <button onClick={logoutclick} className="btn btn-danger">Logout</button>
                     </div>
                 </header>
             </div>

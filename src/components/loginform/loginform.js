@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState } from "react"
 import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
-
+import './loginform.css'
 export function Loginform(){
     const navigate=useNavigate();
     const[userdetails,setuserdetails]=useState();
@@ -27,8 +27,9 @@ export function Loginform(){
     }
     return(
         <>
+            <div className="login-bg">
             <form onSubmit={frmsubmit} className="d-flex text-light   justify-content-center align-items-center " style={{height:"100vh"}}>
-                <dl className="p-4 m-4 bg-secondary rounded">
+                <dl className="p-4 m-4 bg-transparent rounded " style={{border:"1px solid gray", boxShadow:"1px 1px 7px 5px"}}>
                     <h4>Login user</h4>
                     <dt>username</dt>
                     <dd>
@@ -42,6 +43,7 @@ export function Loginform(){
                     <p>don't have account <Link to="/registeruser">register</Link>now </p>
                 </dl>
             </form>
+            </div>
         </>
     )
 }
