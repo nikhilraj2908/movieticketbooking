@@ -80,7 +80,7 @@ export function Ticketbooking() {
                     <div>
                         <select className="form-select text-secondary mx-5">
                             <option>Select Date</option>
-                            <option>{moment().format('MMMM Do YYYY')}</option>
+                            <option>{moment().format('MMMM DD YYYY')}</option>
                             <option>{moment().add(1, 'days').format('MMMM Do YYYY')}</option>
                         </select>
                     </div>
