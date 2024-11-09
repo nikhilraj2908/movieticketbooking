@@ -1,42 +1,23 @@
 const express = require("express");
 const cors = require("cors");
+const mongoose=require("mongoose")
 const multer = require('multer');
 const crypto = require('crypto');//////////it is for giving filename unique 16 bytes hax or 32 bytes
 const path = require('path');//////////////it is used for giving path name to files
 const { GridFsStorage } = require('multer-gridfs-storage');
 const { GridFSBucket } = require('mongodb'); 
-
+const {HandleDBconnection}=require('../backend/connction/dbconnect.js')
+require('dotenv').config();
+const port=process.env.PORT;
+HandleDBconnection();
 const app = express();
-const mongoose = require('mongoose');
 app.use(express.json())
 app.use(cors());
 app.use(express.urlencoded({ extended: true }))
+/////////////models import 
 
-mongoose.connect("mongodb://127.0.0.1:27017/sathuratch")
-    .then(() => console.log("mongo connected"))
-    .catch((err) => console.log("some error", err))
-
-const userschema = new mongoose.Schema({
-    uname: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-})
-
-const User = mongoose.model('User', userschema);
-
-const movieschema = new mongoose.Schema({
-    id: { type: Number },
-    //   poster: {type:String},
-    name: { type: String },
-    genre: { type: String },
-    subtitle: { type: Boolean },
-    language: { type: String },
-  photoId: { type: mongoose.Schema.Types.ObjectId, ref: 'uploads.files' }  // Reference to GridFS file
-
-})
-
-const Movie = mongoose.model("Movie", movieschema);
-
+const {Movie}=require("../backend/models/moviemodel/moviemodel.js")
+const {User}=require("../backend/models/usermodel/usermodel.js")
 
 const conn = mongoose.connection;
 let gfsBucket;
@@ -213,7 +194,7 @@ app.get('/allmovies', async (req, res) => {
 });
 
 app.get('/movie/:id',async(req,res)=>{
-    id=Number(req.params.id);
+    id=req.params.id;
     try{
         const moviedata=await Movie.findOne({id:id});
         console.log("single movie data sended");
@@ -238,31 +219,29 @@ app.delete('/deletemovie/:id',async (req,res)=>{
 })
 
 
-app.put('/editmovie/:id', upload.single('poster'), async (req, res) => {
+app.put('/editmovie/:id',upload.single('file'), async (req, res) => {
+  try {
+    const id = req.params.id;
     const { name, genre, subtitle, language } = req.body;
     const updatedFields = { name, genre, subtitle, language };
-    console.log(req.file);
-
+    updatedFields.id=req.params.id;
     if (req.file) {
-        updatedFields.photoId = req.file.id;
+      updatedFields.photoId = req.file.id;
     }
-   
-    try {
-        console.log("Updating movie with ID:", req.params.id);
-        console.log("Updated fields:", updatedFields);
-        
-        await Movie.findOneAndUpdate({ id: Number(req.params.id) }, updatedFields);
 
-        res.status(200).json({ message: 'Movie updated successfully.' });
-    } catch (err) {
-        console.error('Error updating movie:', err);
-        res.status(500).json({ message: 'Failed to update movie.', error: err.message });
-
+    const updatedMovie = await Movie.findOneAndUpdate({ id:req.params.id }, updatedFields, { new: true }); // Include new: true
+    if (!updatedMovie) {
+      return res.status(404).json({ message: 'Movie not found.' });
     }
+    res.status(200).json({ message: 'Movie updated successfully.', updatedFields });
+    console.log("movie edited successfully")
+  } catch (err) {
+    console.error('Error updating movie:', err);
+    res.status(500).json({ message: 'Failed to update movie.', error: err.message });
+  }
 });
 
-
-app.listen(2000, () => console.log("server started on 2000"))
+app.listen(port, () => console.log("server started on 2000"))
 
 
 

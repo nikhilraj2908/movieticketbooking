@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export function Adminmainpage() {
     const [data, setdata] = useState([]);
     const [editdata, seteditdata] = useState([])
- 
+
 
     async function getdata() {
         try {
@@ -40,26 +40,37 @@ export function Adminmainpage() {
 
     async function frmsubmit(e) {
         e.preventDefault();
-        
-        const formData = new FormData();
-        formData.append("name", editdata.name);
-        formData.append("genre", editdata.genre);
-        formData.append("subtitle", editdata.subtitle);
-        formData.append("language", editdata.language);
-        if (editdata.poster) {
-            formData.append("photoId", editdata.poster);
+        console.log(editdata); // Check the data before submitting
+        try {
+            const formData = new FormData();
+            formData.append("name", editdata.name);
+            formData.append("genre", editdata.genre);
+            formData.append("subtitle", editdata.subtitle);
+            formData.append("language", editdata.language);
+            if (editdata.poster) {
+                formData.append("file", editdata.poster);
+            }
+            await axios.put(`http://127.0.0.1:2000/editmovie/${editdata.id}`, formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+            alert("edited data successfully");
+            seteditdata({
+                name:"",
+                genre:"",
+                subtitle:"",
+                language:"",
+            })
+            await getdata();
+        } catch (error) {
+            console.error("Error updating movie:", error);
         }
-
-        await axios.put(`http://127.0.0.1:2000/editmovie/${editdata.id}`, formData, {
-            headers: { "Content-Type": "multipart/form-data" }
-        });
-        getdata();
     }
 
-    
-   async function editclicked(id) {
-            const response=await axios.get(`http://127.0.0.1:2000/movie/${id}`)
-            seteditdata(response.data);
+
+
+    async function editclicked(id) {
+        const response = await axios.get(`http://127.0.0.1:2000/movie/${id}`)
+        seteditdata(response.data);
     }
     return (
         <>
@@ -154,7 +165,7 @@ export function Adminmainpage() {
                             </form>
                         </div>
                         <div className="modal-footer">
-                         <p>go to  <Link to="/adminmainpage">edit page</Link></p>
+                            <p>go to  <Link to="/adminmainpage">edit page</Link></p>
 
                         </div>
                     </div>
