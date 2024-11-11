@@ -9,7 +9,7 @@ const Dashboard = () => {
         navigate('/registeruser');
     }
     function loginadminclicked(){
-        navigate('/admindashboard');
+        navigate('/adminlogin');
     }
     return (
         <>

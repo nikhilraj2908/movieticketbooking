@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose=require("mongoose")
+const bcrypt=require("bcrypt");
 const multer = require('multer');
 const crypto = require('crypto');//////////it is for giving filename unique 16 bytes hax or 32 bytes
 const path = require('path');//////////////it is used for giving path name to files
@@ -49,14 +50,6 @@ const storage = new GridFsStorage({
 
   const upload = multer({ storage });
 
-
-// app.post('/upload', upload.single('file'), (req, res) => {
-//   if (!req.file) {
-//     return res.status(400).send('No file uploaded.');
-//   }
-//   res.send('File uploaded successfully.');
-// });
-
   app.get('/fileById/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -75,25 +68,20 @@ const storage = new GridFsStorage({
       res.status(500).send('Error fetching file.');
     }
   });
-
   ///////admin pannel route
   app.post("/moviedetails", upload.single('file'), async (req, res) => {
     let id;
     let exists = true;
-    // Generate a unique application ID
     while (exists) {
         id = Math.round(Math.random() * 10000);
         exists = await Movie.exists({ id: id });
     }
-
     try {
       const { name, genre, subtitle, language  } = req.body;
   
       if (!name || !id || !genre || !subtitle || !language || !req.file) {
         return res.status(400).send("All fields are required, including the file.");
       }
-  
-      // Create a new subadmin entry
       const newMovie = new Movie({
         id,
         name,
@@ -102,8 +90,6 @@ const storage = new GridFsStorage({
         language,
         photoId: new mongoose.Types.ObjectId(req.file.id) 
       });
-  
-      // Save Movie to the database
       await newMovie.save();
       res.status(200).json({ message: 'Movie saved successfully', Movie: newMovie });
       console.log("movie added succefully");
@@ -118,9 +104,7 @@ app.post('/registeruser', (req, res) => {
     if (!uname || !password || !email) {
         return res.status(404).json({ message: "data not coming" })
     }
-
     const newuser = new User({ uname, password, email })
-
     newuser.save()
         .then(() => {
             console.log("user registered succefully")
@@ -154,35 +138,25 @@ app.post('/loginuser', (req, res) => {
         });
 });
 
-// app.post('/moviedetails', async (req, res) => {
-//     let id; 
-//     let exists = true;
-//     // Generate a unique application ID
-//     while (exists) {
-//         id = Math.round(Math.random() * 10000);
-//         exists = await Movie.exists({ id: id });
-//     }
-//     const { name, genre, subtitle, language } = req.body;
-//     if (!name || !id || !genre || !subtitle || !language) {
-//         return res.status(400).json({ message: "all fields are required" });
-//     }
-//     try {
-//         const newmovie = new Movie({ name, genre, language, id, subtitle })
-//         newmovie.save()
-//             .then(() => {
-//                 console.log("movie saved succefully")
-//                 res.status(201).json({ message: "movie saved  succefully" })
-//             })
-//             .catch((err) => {
-//                 console.log("error in saving movie", err)
-//                 res.status(500).json({ message: "movie not saved" })
-//             })
 
-//     }
-//     catch (err) {
-//         console.log(err);
-//     }
-// })
+app.post('/loginadmin',async(req,res)=>{
+  const{AdminName,AdminPassword}=req.body;
+  const adminName="Nikhilraj";
+  const adminPassword="$2b$10$6nnk0yg073O15OkxvwXHEOhOdskWUt88MihlmE2dASd77sutpI4c6"
+  if(!AdminName || !AdminPassword){
+    res.status(401).json({message:"all fields are reqquired"})
+  }
+  if(AdminName===adminName){
+    const passwordMatch = await bcrypt.compare(AdminPassword,adminPassword);
+    if(passwordMatch){
+     return res.status(200).json({message:"passsword verified"})
+    }else{
+     return res.status.json({message:"password wrong"})
+    }
+  }else{
+   return res.status(401).json({message:"admin not found"});
+  }
+})
 
 app.get('/allmovies', async (req, res) => {
     try {
@@ -210,14 +184,12 @@ app.delete('/deletemovie/:id',async (req,res)=>{
     try {
         const movie=await Movie.deleteOne({id:id})
         res.status(200).json({message:"deleted succefully"});
-        console.log('ID to delete:', id)
-        
+        console.log('ID to delete:', id)    
     }
     catch(err){
         console.log(err);
     }
 })
-
 
 app.put('/editmovie/:id',upload.single('file'), async (req, res) => {
   try {
@@ -240,7 +212,6 @@ app.put('/editmovie/:id',upload.single('file'), async (req, res) => {
     res.status(500).json({ message: 'Failed to update movie.', error: err.message });
   }
 });
-
 app.listen(port, () => console.log("server started on 2000"))
 
 
