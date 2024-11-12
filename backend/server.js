@@ -99,43 +99,51 @@ const storage = new GridFsStorage({
     }
   });
 
-app.post('/registeruser', (req, res) => {
-    const { uname, password, email } = req.body;
+app.post('/registeruser',async(req,res)=>{
+  try{
+    const {uname,email,password}=req.body;
     if (!uname || !password || !email) {
-        return res.status(404).json({ message: "data not coming" })
-    }
-    const newuser = new User({ uname, password, email })
+      return res.status(404).json({ message: "data not coming" })
+  }
+    const saltRound=10;
+    const hashpassword=await bcrypt.hash(password,saltRound)
+    
+    const newuser=new User({uname,email,password:hashpassword})
     newuser.save()
-        .then(() => {
-            console.log("user registered succefully")
-            res.status(201).json({ message: "user registered succefully" })
-        })
-        .catch((err) => {
-            console.log("error in registeruser", err)
-            res.status(500).json({ message: "user not registered " })
-        })
+    .then(()=>{
+      console.log("user registered succefully")
+      res.status(200).json({message:"user created successfully"})
+    })
+    .catch((err) => {
+      console.log("error in registeruser", err)
+      res.status(500).json({ message: "user not registered " })
+  })
+  }
+  catch(err){
+    console.log(err);
+  }
 })
 
-app.post('/loginuser', (req, res) => {
-    const { uname, password } = req.body;
+app.post('/loginuser', async(req, res) => {
+    try{
+      const { uname, password } = req.body;
     if (!uname || !password) {
         return res.status(400).json({ message: "Username and password are required." });
     }
-    User.findOne({ uname: uname })
-        .then(user => {
-            if (!user) {
-                return res.status(404).json({ message: "Username not found." });
-            }
-            if (user.password === password) {
-                res.status(200).json({ message: "Username and password are correct." });
-            } else {
-                res.status(401).json({ message: "Incorrect password." });
-            }
-        })
-        .catch(err => {
-            console.log("Error in loginuser", err);
-            res.status(500).json({ message: "An error occurred while logging in." });
-        });
+    const data=await User.findOne({ uname: uname })
+    if(!data){
+        return res.status(404).json({ message: "User not found." })
+    }
+    const isMatch=await bcrypt.compare(password,data.password)
+    if(isMatch){
+      return res.status(200).json({ message: "User logged in successfully." })
+    }else {
+              res.status(401).json({ message: "Incorrect password." });
+          }
+    }
+    catch(err){
+      console.log(err);
+    }
 });
 
 
@@ -151,7 +159,7 @@ app.post('/loginadmin',async(req,res)=>{
     if(passwordMatch){
      return res.status(200).json({message:"passsword verified"})
     }else{
-     return res.status.json({message:"password wrong"})
+     return res.status(300).json({message:"password wrong"})
     }
   }else{
    return res.status(401).json({message:"admin not found"});
