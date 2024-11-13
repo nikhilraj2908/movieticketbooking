@@ -4,11 +4,12 @@ import img2 from '../../assets/images/banner2.avif';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import  moment from "moment"
+import { useNavigate } from "react-router-dom";
 export function Ticketbooking() {
     const [selectedlanguage, setselectedlanguage] = useState([])
     const[realmoviedata,setrealmoviedata]=useState([]);
     const[checkbox,setcheckbox]=useState()
-
+    const navigate=useNavigate();
     async function getdata(){
         const moviedata=await axios.get("http://127.0.0.1:2000/allmovies")
         setrealmoviedata(moviedata.data)
@@ -45,6 +46,10 @@ export function Ticketbooking() {
             const filtermovie=realmoviedata.filter(movie => movie.genre.includes(selectedmovie));
             setselectedlanguage(filtermovie);
         }
+    }
+    function bookticketclicked(id){
+        navigate(`/ticketbookpage/${id}`)
+        console.log(id)
     }
     return (
         <>
@@ -156,7 +161,7 @@ export function Ticketbooking() {
                                         <div style={{ width: "40%" }}>{movie.language}</div>
                                         <div>{movie.genre}</div>
                                     </div>
-                                    <button className="btn btn-success w-100">Book Ticket</button>
+                                    <button className="btn btn-success w-100" onClick={()=>bookticketclicked(movie.id)}>Book Ticket</button>
                                 </div>
                             </div>)
                         )

@@ -124,6 +124,8 @@ app.post('/registeruser',async(req,res)=>{
   }
 })
 
+
+
 app.post('/loginuser', async(req, res) => {
     try{
       const { uname, password } = req.body;
