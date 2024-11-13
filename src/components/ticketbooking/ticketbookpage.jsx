@@ -4,12 +4,13 @@ import pvrsimg from '../../assets/images/moviepvrs.png'
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import moment from "moment";
+import SeatMap from "../seatscomponent/seatscomponent";
 
 export function Ticketbookpage() {
     const params = useParams()
     const [moviedata, setmoviedata] = useState({});
     const [image, setimage] = useState("");
-    const[selecteddate,setselecteddate]=useState("today")
+    const [selecteddate, setselecteddate] = useState("today")
     async function getmoviedata(movieid) {
         const movie = await axios.get(`http://127.0.0.1:2000/movie/${movieid}`);
         setmoviedata(movie.data);
@@ -18,48 +19,66 @@ export function Ticketbookpage() {
         console.log(params.id);
         getmoviedata(params.id);
     }, [params.id]);
-    function btndateclick(day){
+    function btndateclick(day) {
         setselecteddate(day)
     }
+    const [selectedSeats, setSelectedSeats] = useState([]);
+
+    const handleSelectedSeats = (seats) => {
+        console.log('Selected seats:', seats);
+        setSelectedSeats(seats);
+    };
     return (
         <div>
             <Header></Header>
-            <div className="row bg-secondary">
+            <div className="row bg-secondary text-light">
                 <span className="col-3 ">
-                    <figure className="d-flex justify-content-center align-items-center" style={{ height: "350px" }}>
-                        <img
-                            src={`http://127.0.0.1:2000/fileById/${moviedata.photoId}`}
-                            alt="movie poster"
-                            width="55%"
-                        ></img>
-                        {/* <figcaption className="d-block">cvbnm</figcaption> */}
-                    </figure>
+                    <div className="d-flex justify-content-center align-items-center" style={{ height: "350px" }}>
+                        <figure className="text-center">
+                            <img
+                                src={`http://127.0.0.1:2000/fileById/${moviedata.photoId}`}
+                                alt="movie poster"
+                                width="55%"
+                            ></img>
+                            <figcaption className="d-block">Poster : {moviedata.name}</figcaption>
+                        </figure>
+                    </div>
+
                 </span>
                 <span className="col-9">
                     <div className="d-flex align-items-center" style={{ height: "350px" }}>
                         <div >
-                            <h3 className="mb-4">TITLE : {moviedata.name?moviedata.name.toUpperCase():"loading..."}</h3>
+                            <h3 className="mb-4">TITLE : {moviedata.name ? moviedata.name.toUpperCase() : "loading..."}</h3>
                             <div className="my-2">
                                 <span>U/A</span>
                                 <span className="mx-2 bi bi-box-fill">&nbsp;2h48min</span>
                                 <span className="bi bi-box-fill ">&nbsp;{moviedata.subtitle ? "SUBTITLE : AVAILABLE" : "SUBTITLE : NOT AVAILABLE "}</span>
-                                <span className="bi bi-box-fill mx-1">&nbsp; LANGUAGE : {moviedata.language?moviedata.language.toUpperCase():"loading...."}</span>
+                                <span className="bi bi-box-fill mx-1">&nbsp; LANGUAGE : {moviedata.language ? moviedata.language.toUpperCase() : "loading...."}</span>
                             </div>
                             <div className="w-75 my-2"><p>MOVIE DESCRIPTION : Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum nemo aut dolores eligendi odit dolore iure, iste ad, nobis sapiente officia dolorum quasi minus saepe hic magnam. Eaque, debitis non.</p></div>
                             <div>
                                 <img src={pvrsimg} alt="pvr" width="30%"></img>
                             </div>
-                            <button className="p-0 mt-4 btn btn-link text-dark" >View more</button>
+                            <button className="p-0 mt-4 btn btn-link text-light" >View more</button>
                         </div>
                     </div>
                 </span>
             </div>
-            <div  className="d-flex btn-group col-3 m-2">
-                <button onClick={()=>btndateclick("today")} className={`btn ${selecteddate==="today"?"btn-primary":"btn-light"}`}>{moment().format('MMMM DD')}</button>    
-                <button onClick={()=>btndateclick("tomorrow")} className={`btn ${selecteddate==="tomorrow"?"btn-primary":"btn-light"} `}>{moment().add(1, 'days').format('MMMM DD')}</button>    
+            <div className="d-flex btn-group col-3 m-2">
+                <button onClick={() => btndateclick("today")} className={`btn ${selecteddate === "today" ? "btn-primary" : "btn-light"}`}>{moment().format('MMMM DD')}</button>
+                <button onClick={() => btndateclick("tomorrow")} className={`btn ${selecteddate === "tomorrow" ? "btn-primary" : "btn-light"} `}>{moment().add(1, 'days').format('MMMM DD')}</button>
             </div>
-            <div className="bg-light " style={{height:"100vh"}}>
+            <div className="bg-light " style={{ height: "100vh" }}>
+                <div className="bg-dark text-light" >
+                    <SeatMap onSeatSelectionChange={handleSelectedSeats} />
+                    {
+                        console.log(selectedSeats)
+                    }
+                    <div className="pb-3 d-flex justify-content-center">
+                        <button className="w-50 btn btn-primary" >Book Now</button>
 
+                    </div>
+                </div>
             </div>
         </div>
     )

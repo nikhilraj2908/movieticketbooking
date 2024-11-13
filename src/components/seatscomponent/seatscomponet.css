@@ -1,0 +1,50 @@
+.screen {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 20px;
+  border-bottom: 2px solid rgb(225, 199, 199);
+  border-radius: 200px;
+  margin-left:10% ;
+  margin-right:10% ;
+  padding-bottom:10% ;
+  margin-top: -55px;
+}
+
+.seat-section {
+  margin-bottom: 30px;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.row-label {
+  width: 20px;
+  margin-right: 10px;
+}
+
+.seat {
+  width: 30px;
+  height: 30px;
+  margin: 2px;
+  text-align: center;
+  border: 1px solid #000;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.seat.available {
+  background-color: #e0e0e0;
+}
+
+.seat.selected {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.seat.occupied {
+  background-color: #d3d3d3;
+  cursor: not-allowed;
+}
