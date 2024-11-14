@@ -14,14 +14,14 @@ export function Header() {
     return (
 
         <>
-            <div className="position-sticky top-0 z-2">
+            <div className=" position-sticky top-0 z-2">
                 <header className="px-5 bg-light d-flex justify-content-between align-items-center" style={{height:"10vh"}}>
                     <div className="fs-4">Logo</div>
                     <nav className="d-flex fs-6">
                         <span className={`nav-items ${selecteditem=="home"?"bg-primary btn text-light":"bg-light"}`} onClick={()=>navitemclick("home")}> <Link to='/ticketbooking'>Home</Link></span>
-                        <span className={`nav-items ${selecteditem=="showtimings"?"bg-primary btn text-light":"bg-light"}`} onClick={()=>navitemclick("showtimings")}><a  href="javascript:void(0)">Showtimings</a></span>
-                        <span className={`nav-items ${selecteditem=="cinema"?"bg-primary btn text-light":"bg-light"}`} onClick={()=>navitemclick("cinema")}><a href="javascript:void(0)">Cinema</a></span>
-                        <span className={`nav-items ${selecteditem=="offers"?"bg-primary btn text-light":"bg-light"}`} onClick={()=>navitemclick("offers")}><a href="javascript:void(0)">Offers</a></span>
+                        <span className={`nav-items ${selecteditem=="showtimings"?"bg-primary btn text-light":"bg-light"}`} onClick={()=>navitemclick("showtimings")}><a  href="#">Showtimings</a></span>
+                        <span className={`nav-items ${selecteditem=="cinema"?"bg-primary btn text-light":"bg-light"}`} onClick={()=>navitemclick("cinema")}><a href="#">Cinema</a></span>
+                        <span className={`nav-items ${selecteditem=="offers"?"bg-primary btn text-light":"bg-light"}`} onClick={()=>navitemclick("offers")}><a href="#">Offers</a></span>
                         <span className={`nav-items ${selecteditem=="more"?"bg-primary btn text-light":"bg-light"}`} onClick={()=>navitemclick("more")}>
                             <select className="form-select " style={{border:"none", backgroundColor:"transparent"}}>
                                 <option>More</option>

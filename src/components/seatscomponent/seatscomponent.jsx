@@ -25,12 +25,12 @@ const SeatMap = ({ onSeatSelectionChange }) => {
     onSeatSelectionChange(updatedSeats); // Send the updated seats to the main component
   };
   return (
-    <div className="seat-map-container">
+    <div className="seat-map-container ">
       <div className="screen pt-3">SCREEN</div>
       {seatRows.map((section, index) => (
         <div key={index} className="seat-section d-flex justify-content-center text-center">
           <div>
-          <h3>{section.type} ({section.price.toFixed(2)})</h3>
+          <h3>{section.type} ({section.price.toLocaleString("en-in",{style:'currency',currency:"INR"})})</h3>
           {section.rows.map(row => (
             <div key={row} className="seat-row mx-2">
               <span className="row-label">{row}</span>

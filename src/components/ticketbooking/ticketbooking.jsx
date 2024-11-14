@@ -3,22 +3,25 @@ import img1 from '../../assets/images/banner.jpg';
 import img2 from '../../assets/images/banner2.avif';
 import { useEffect, useState } from "react";
 import axios from "axios";
-import  moment from "moment"
+import moment from "moment"
 import { useNavigate } from "react-router-dom";
+import { Field, Form, Formik } from "formik";
+import * as Yup from 'yup'
 export function Ticketbooking() {
     const [selectedlanguage, setselectedlanguage] = useState([])
-    const[realmoviedata,setrealmoviedata]=useState([]);
-    const[checkbox,setcheckbox]=useState()
-    const navigate=useNavigate();
-    async function getdata(){
-        const moviedata=await axios.get("http://127.0.0.1:2000/allmovies")
+    const [realmoviedata, setrealmoviedata] = useState([]);
+    const [checkbox, setcheckbox] = useState()
+    const navigate = useNavigate();
+    const [quickmoviedata, setquickmoviedata] = useState({})
+    async function getdata() {
+        const moviedata = await axios.get("http://127.0.0.1:2000/allmovies")
         setrealmoviedata(moviedata.data)
         setselectedlanguage(moviedata.data)
     }
-    useEffect(()=>{
+    useEffect(() => {
         getdata();
-        
-    },[])
+
+    }, [])
     function languageselect(e) {
         const selectedValue = e.target.value;
         if (selectedValue === "All languages") {
@@ -28,29 +31,42 @@ export function Ticketbooking() {
             setselectedlanguage(filteredMovies); // Show filtered movies based on selected language
         }
     }
-    function checkboxclicked(){
-        if(checkbox){
+    function checkboxclicked() {
+        if (checkbox) {
             setcheckbox(false);
             setselectedlanguage(realmoviedata);
-        }else{
+        } else {
             setcheckbox(true);
             const filteredMovies = realmoviedata.filter(movie => movie.subtitle === true);
             setselectedlanguage(filteredMovies);
         }
     }
-    function categorychange(e){
-       const selectedmovie=e.target.value;
-        if(selectedmovie==="All Genres"){
+    function categorychange(e) {
+        const selectedmovie = e.target.value;
+        if (selectedmovie === "All Genres") {
             setselectedlanguage(realmoviedata);
-        }else{
-            const filtermovie=realmoviedata.filter(movie => movie.genre.includes(selectedmovie));
+        } else {
+            const filtermovie = realmoviedata.filter(movie => movie.genre.includes(selectedmovie));
             setselectedlanguage(filtermovie);
         }
     }
-    function bookticketclicked(id){
+    function bookticketclicked(id) {
         navigate(`/ticketbookpage/${id}`)
         console.log(id)
+
     }
+    const initialValues = {
+        moviename: "",
+        date: "",
+        cinema: "",
+        time: ""
+    }
+    async function onSubmit(values, { resetForm }) {
+        setquickmoviedata(values)
+        console.log("form submitted succefully", values)
+        resetForm();
+    }
+
     return (
         <>
             <Header />
@@ -71,42 +87,53 @@ export function Ticketbooking() {
                         <span className="carousel-control-next-icon" aria-hidden="true"></span>
                     </button>
                 </div>
-                <div className="position-sticky z-2 top-0 d-flex justify-content-around align-items-center bg-light  py-3">
-                    <div>
-                        <b>Quick Book</b>
-                    </div>
-                    <div>
-                        <select className="form-select text-secondary mx-5">
-                            <option >Select Movie</option>
-                            <option>{selectedlanguage.length > 0 ? selectedlanguage[0].name : 'No Movies'}</option>
-                            <option>{selectedlanguage.length > 1 ? selectedlanguage[1].name : 'No Movies'}</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select className="form-select text-secondary mx-5">
-                            <option>Select Date</option>
-                            <option>{moment().format('MMMM DD YYYY')}</option>
-                            <option>{moment().add(1, 'days').format('MMMM Do YYYY')}</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select className="form-select text-secondary mx-5">
-                            <option>Select Cinema</option>
-                            <option>PVR vijaynagar indore</option>
-                            <option>PVR nandanagr indore</option>
-                            <option> PVR C21 mall indore</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select className="form-select text-secondary mx-5">
-                            <option>Select Timing</option>
-                            <option>9:00 AM</option>
-                            <option>12:00 PM</option>
-                            <option>3:00 PM</option>
-                            <option>9:00 PM</option>
-                        </select>
-                    </div>
-                    <button className="btn btn-success ms-4">Book Now</button>
+                <div className="position-sticky z-2 top-0  bg-light  py-3">
+                    <Formik
+                        initialValues={initialValues}
+                        onSubmit={onSubmit}
+                    >
+                        {({ values }) => (
+                            <Form className="d-flex justify-content-around align-items-center">
+                                <div>
+                                    <b>Quick Book</b>
+                                </div>
+                                <div>
+                                    <Field as="select" name="moviename" className="form-select text-secondary mx-5">
+                                        <option value="">Select Movie</option>
+                                        {selectedlanguage.map((movie, index) => (
+                                            <option key={index} value={movie.name}>{movie.name}</option>
+                                        ))}
+                                    </Field>
+                                </div>
+                                <div>
+                                    <Field as="select" name="date" className="form-select text-secondary mx-5">
+                                        <option value="">Select Date</option>
+                                        <option value={moment().format('YYYY-MM-DD')}>{moment().format('MMMM Do YYYY')}</option>
+                                        <option value={moment().add(1, 'days').format('YYYY-MM-DD')}>{moment().add(1, 'days').format('MMMM Do YYYY')}</option>
+                                    </Field>
+                                </div>
+                                <div>
+                                    <Field as="select" name="cinema" className="form-select text-secondary mx-5">
+                                        <option value="">Select Cinema</option>
+                                        <option value="PVR vijaynagar indore">PVR vijaynagar indore</option>
+                                        <option value="PVR nandanagr indore">PVR nandanagr indore</option>
+                                        <option value="PVR C21 mall indore">PVR C21 mall indore</option>
+                                    </Field>
+                                </div>
+                                <div>
+                                    <Field as="select" name="time" className="form-select text-secondary mx-5">
+                                        <option value="">Select Timing</option>
+                                        <option value="9:00 AM">9:00 AM</option>
+                                        <option value="12:00 PM">12:00 PM</option>
+                                        <option value="3:00 PM">3:00 PM</option>
+                                        <option value="9:00 PM">9:00 PM</option>
+                                    </Field>
+                                </div>
+                                <button type="submit" className="btn btn-success ms-4">Book Now</button>
+                            </Form>
+                        )}
+                    </Formik>
+
                 </div>
                 <div className="d-flex justify-content-between align-items-center px-5 p-2">
                     <div className="" >
@@ -141,7 +168,7 @@ export function Ticketbooking() {
                         selectedlanguage.map(movie => (
                             <div key={movie.id} className="card my-3   " style={{ width: "17rem" }}>
                                 <div className="card-body">
-                                {movie.photoId ? (
+                                    {movie.photoId ? (
                                         <img
                                             src={`http://localhost:2000/fileById/${movie.photoId}`}
                                             alt={movie.name}
@@ -150,7 +177,7 @@ export function Ticketbooking() {
                                     ) : (
                                         'No Image'
                                     )}
-                                  
+
                                 </div>
                                 <div className="card-footer">
                                     <div className="d-flex justify-content-between">
@@ -161,7 +188,7 @@ export function Ticketbooking() {
                                         <div style={{ width: "40%" }}>{movie.language}</div>
                                         <div>{movie.genre}</div>
                                     </div>
-                                    <button className="btn btn-success w-100" onClick={()=>bookticketclicked(movie.id)}>Book Ticket</button>
+                                    <button className="btn btn-success w-100" onClick={() => bookticketclicked(movie.id)}>Book Ticket</button>
                                 </div>
                             </div>)
                         )
