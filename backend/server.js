@@ -15,10 +15,11 @@ const app = express();
 app.use(express.json())
 app.use(cors());
 app.use(express.urlencoded({ extended: true }))
-/////////////models import 
+
 
 const {Movie}=require("../backend/models/moviemodel/moviemodel.js")
 const {User}=require("../backend/models/usermodel/usermodel.js")
+const {Ticketbooking}=require("../backend/models/ticketdetailsmodel/ticketdetailsmodel.js")
 
 const conn = mongoose.connection;
 let gfsBucket;
@@ -222,6 +223,22 @@ app.put('/editmovie/:id',upload.single('file'), async (req, res) => {
     res.status(500).json({ message: 'Failed to update movie.', error: err.message });
   }
 });
+
+app.post("/ticketdata",async(req,res)=>{
+  try{
+    const data=req.body;
+    if(!data){
+      return res.status(404).json({ message: "ticketdata not found." })
+    }else{
+      await Ticketbooking.create(data);
+      return res.status(201).json({message:"ticketdata submitted"})
+    }
+  }
+  catch(err){
+    console.log(err);
+  }
+})
+
 app.listen(port, () => console.log("server started on 2000"))
 
 

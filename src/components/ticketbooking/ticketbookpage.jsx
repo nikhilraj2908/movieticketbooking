@@ -12,6 +12,8 @@ export function Ticketbookpage() {
     const [moviedata, setmoviedata] = useState({});
     const [image, setimage] = useState("");
     const [selecteddate, setselecteddate] = useState("today")
+    const [selectedSeats, setSelectedSeats] = useState([]);
+    const [finaldata,setfinaldata]=useState({})
     async function getmoviedata(movieid) {
         const movie = await axios.get(`http://127.0.0.1:2000/movie/${movieid}`);
         setmoviedata(movie.data);
@@ -23,7 +25,6 @@ export function Ticketbookpage() {
     function btndateclick(day) {
         setselecteddate(day)
     }
-    const [selectedSeats, setSelectedSeats] = useState([]);
 
     const handleSelectedSeats = (seats) => {
         console.log('Selected seats:', seats);
@@ -33,11 +34,20 @@ export function Ticketbookpage() {
         date: "",
         time: "",
         cinema: "",
-        seatscount: selectedSeats.length
+        seatscount: selectedSeats,
     }
     async function onSubmit(values, { resetForm }) {
-        console.log("form submitted succefully", values)
+        const updatedValues = {
+            ...values,
+            seatscount: selectedSeats, // Get the latest selectedSeats here
+        };
+        console.log("form submitted succefully", updatedValues)
+        setfinaldata(updatedValues);
         resetForm();
+    }
+    async function bookClick(){
+        const data=await axios.post('http://127.0.0.1:2000/ticketdata',finaldata);
+        console.log(data);
     }
     return (
         <div>
@@ -91,9 +101,9 @@ export function Ticketbookpage() {
                             onSubmit={onSubmit}
                         >
                             {({ handleSubmit }) => (
-                                <Form className="d-flex justify-content-around" onSubmit={handleSubmit}>
-                                    <div>More Information</div>
-                                    <div>
+                                <Form className="d-flex justify-content-center mb-3" onSubmit={handleSubmit}>
+                                    <div >More Information</div>
+                                    <div className="mx-1">
                                         <Field required as="select" name="time" className="form-select text-secondary mx-5">
                                             <option value="">Select Timing</option>
                                             <option value="9:00 AM">9:00 AM</option>
@@ -102,14 +112,14 @@ export function Ticketbookpage() {
                                             <option value="9:00 PM">9:00 PM</option>
                                         </Field>
                                     </div>
-                                    <div>
+                                    <div className="mx-1">
                                         <Field required as="select" name="date" className="form-select text-secondary mx-5">
                                             <option value="">Select Date</option>
                                             <option value={moment().format('YYYY-MM-DD')}>{moment().format('MMMM Do YYYY')}</option>
                                             <option value={moment().add(1, 'days').format('YYYY-MM-DD')}>{moment().add(1, 'days').format('MMMM Do YYYY')}</option>
                                         </Field>
                                     </div>
-                                    <div>
+                                    <div className="ms-1 me-2">
                                         <Field required as="select" name="cinema" className="form-select text-secondary mx-5">
                                             <option value="">Select Cinema</option>
                                             <option value="PVR vijaynagar indore">PVR vijaynagar indore</option>
@@ -117,13 +127,13 @@ export function Ticketbookpage() {
                                             <option value="PVR C21 mall indore">PVR C21 mall indore</option>
                                         </Field>
                                     </div>
-                                    <div className="pb-3 d-flex justify-content-center">
+                                    <div className="w-25 ms-5">
                                         <button type="submit" className=" btn btn-warning">Confirm details</button>
                                     </div>
                                 </Form>)}
                         </Formik>
                         <div className="pb-3 d-flex justify-content-center">
-                            <button className="w-100 5 btn btn-primary" >Book Now</button>
+                            <button onClick={bookClick} className="w-75 5 btn btn-primary" >Book Now</button>
                         </div>
                     </div>
                 </div>
