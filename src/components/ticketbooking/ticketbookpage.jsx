@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { Header } from "../header/header";
 import pvrsimg from '../../assets/images/moviepvrs.png'
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import SeatMap from "../seatscomponent/seatscomponent";
 import { Field, Form, Formik } from "formik";
+import { Cookies, useCookies } from "react-cookie";
 
 export function Ticketbookpage() {
     const params = useParams()
@@ -14,6 +15,8 @@ export function Ticketbookpage() {
     const [selecteddate, setselecteddate] = useState("today")
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [finaldata,setfinaldata]=useState({})
+    const [Cookies,setcookie,removecookie]=useCookies()
+    const navigate=useNavigate();
     async function getmoviedata(movieid) {
         const movie = await axios.get(`http://127.0.0.1:2000/movie/${movieid}`);
         setmoviedata(movie.data);
@@ -31,6 +34,8 @@ export function Ticketbookpage() {
         setSelectedSeats(seats);
     };
     const initialValues = {
+        username:Cookies.username,
+        moviename:"",
         date: "",
         time: "",
         cinema: "",
@@ -40,14 +45,24 @@ export function Ticketbookpage() {
         const updatedValues = {
             ...values,
             seatscount: selectedSeats, // Get the latest selectedSeats here
+            moviename:moviedata.name
         };
         console.log("form submitted succefully", updatedValues)
         setfinaldata(updatedValues);
         resetForm();
     }
+
+     
+
     async function bookClick(){
-        const data=await axios.post('http://127.0.0.1:2000/ticketdata',finaldata);
-        console.log(data);
+        const response=await axios.post('http://127.0.0.1:2000/ticketdata',finaldata);
+        const ticketId = response.data.ticketId;
+        if (ticketId) {
+            alert("Ticket booked successfully!");
+            navigate(`/ticketgeneration/${ticketId}`);
+        } else {
+            throw new Error("Ticket ID not returned from server.");
+        }
     }
     return (
         <div>

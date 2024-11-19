@@ -229,15 +229,35 @@ app.post("/ticketdata",async(req,res)=>{
     const data=req.body;
     if(!data){
       return res.status(404).json({ message: "ticketdata not found." })
+      
     }else{
-      await Ticketbooking.create(data);
-      return res.status(201).json({message:"ticketdata submitted"})
+      const savedTicket =await Ticketbooking.create(data);
+      return res.status(201).json({ ticketId: savedTicket._id });
     }
   }
   catch(err){
     console.log(err);
   }
 })
+
+
+app.get("/getticket/:id", async (req, res) => {
+  try {
+    const movieid = req.params.id;
+    if (!movieid) {
+      return res.status(400).json({ message: "not found." });
+    } else {
+      const ticket = await Ticketbooking.findOne({_id: new mongoose.Types.ObjectId(movieid)})
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found." });
+      }
+      return res.status(200).json(ticket);
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal server error." });
+  }
+});
 
 app.listen(port, () => console.log("server started on 2000"))
 
