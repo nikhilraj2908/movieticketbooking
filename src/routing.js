@@ -10,6 +10,7 @@ import { Adminmainpage } from "./admin/adminmainpage";
 import { Adminlogin } from "./admin/adminloginpage";
 import { Ticketbookpage } from "./components/ticketbooking/ticketbookpage";
 import { Ticketgeneration } from "./components/ticketbooking/ticketgeneration";
+import { Defaultcomponent } from "./components/defaultroute";
 export function Routing() {
     const [cookie, setcookie, removecookie] = useCookies();
     return (
@@ -25,6 +26,7 @@ export function Routing() {
                     <Route path="/adminlogin" element={<Adminlogin />}></Route>
                     <Route path='/ticketbookpage/:id' element={cookie.username ? <Ticketbookpage /> : <Loginform />}></Route>
                     <Route path="/ticketgeneration/:id" element={<Ticketgeneration/>}></Route>
+                    <Route path="*" element={<Defaultcomponent/>}></Route>
                 </Routes>
             </BrowserRouter>
         </>
