@@ -1,11 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react"
+import { useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
 
 export function Adminmainpage() {
     const [data, setdata] = useState([]);
     const [editdata, seteditdata] = useState([])
-
+    const[Cookies,setcookie,removecookie]=useCookies(["admin"]);
 
     async function getdata() {
         try {
@@ -72,17 +73,21 @@ export function Adminmainpage() {
         const response = await axios.get(`http://127.0.0.1:2000/movie/${id}`)
         seteditdata(response.data);
     }
+    function logoutadmin(){
+        removecookie("admin")
+    }
     return (
         <>
             <h3>Admin dashboard</h3>
             <table className="table over table-striped table-bordered">
                 <thead>
-                    <tr> {/* Wrap <th> elements in a <tr> */}
+                    <tr> 
                         <th>Movie Name</th>
                         <th>Subtitle</th>
                         <th>Genre</th>
                         <th>Language</th>
                         <th>Poster</th>
+                        <th onClick={logoutadmin} className="btn btn-link ">logout</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,6 +117,7 @@ export function Adminmainpage() {
                     }
                 </tbody>
             </table>
+            
             <div className="modal fade" id="modal">
                 <div className="modal-dialog">
                     <div className="modal-content">
